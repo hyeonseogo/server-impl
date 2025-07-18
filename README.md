@@ -1,7 +1,8 @@
 # 📘 Spring REST API: 회원 + 게시판 프로젝트
 
 이 프로젝트는 Spring Boot, MyBatis, MySQL을 기반으로 한 **회원 관리 및 게시판 기능**을 제공하는 백엔드 RESTful API 서버입니다.  
-JWT를 이용한 로그인 인증 기능과 BCrypt를 이용한 비밀번호 암호화가 포함되어 있습니다.
+JWT를 이용한 로그인 인증 기능과 BCrypt를 이용한 비밀번호 암호화가 포함되어 있으며,  
+프론트엔드는 HTML + JS(fetch API)를 사용하여 JWT 기반 API와 연동됩니다.
 
 ---
 
@@ -17,6 +18,7 @@ JWT를 이용한 로그인 인증 기능과 BCrypt를 이용한 비밀번호 암
 - **BCrypt**
 - **JUnit 5**
 - **IntelliJ IDEA**
+- **HTML + JavaScript (Vanilla)**
 
 ---
 
@@ -41,19 +43,28 @@ JWT를 이용한 로그인 인증 기능과 BCrypt를 이용한 비밀번호 암
 ## 📁 프로젝트 구조
 
 ```
-src/
-├── main/
-│ ├── java/
-│ │ └── com.koreait.restapi/
-│ │ ├── controller/ # REST 컨트롤러
-│ │ ├── dto/ # 요청/응답 DTO
-│ │ ├── service/ # 비즈니스 로직
-│ │ ├── mapper/ # MyBatis 인터페이스
-│ │ ├── jwt/ # JWT 유틸
+📁 backend/
+├── src/
+│ ├── main/java/com.koreait.restapi/
+│ │ ├── controller/
+│ │ ├── dto/
+│ │ ├── service/
+│ │ ├── mapper/
+│ │ ├── jwt/
 │ │ └── RestapiApplication.java
 │ └── resources/
-│ ├── mapper/ # MyBatis XML
+│ ├── mapper/
 │ └── application.properties
+└── database.sql
+
+📁 frontend/
+├── register.html # 회원가입
+├── login.html # 로그인
+├── post-list.html # 게시글 목록 (페이징)
+├── post-detail.html # 게시글 상세 + 수정/삭제
+├── create-post.html # 게시글 작성
+├── update-post.html # 게시글 수정
+├── mypage.html # 내 정보 조회 및 수정
 ```
 
 ---
@@ -97,8 +108,23 @@ mybatis.configuration.map-underscore-to-camel-case=true
 또는 IntelliJ에서 RestapiApplication.java 실행
 
 ---
+### 프론트엔드 실행 방법
+1. frontend/ 폴더 안의 .html 파일을 브라우저에서 열어 실행
 
-### 테스트 방법
+2. HTML과 JavaScript는 fetch API를 통해 백엔드에 요청
+
+3. 로그인 시 발급된 JWT 토큰은 localStorage에 저장되어 이후 인증에 사용됩니다.
+
+---
+
+### 인증 방식
+- JWT 토큰은 로그인 후 응답으로 발급되며, localStorage에 저장
+
+- 인증이 필요한 요청에는 반드시 Authorization: Bearer <토큰> 헤더 포함
+
+---
+
+### API 테스트 방법
 - Postman으로 API 요청을 테스트할 수 있습니다.
 - 모든 JWT 인증 요청에는 헤더 포함:
 ```
