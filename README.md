@@ -61,37 +61,13 @@ src/
 ## 실행 방법
 
 ### 1. MySQL 설정
+프로젝트 루트에 포함된 [`database.sql`](./database.sql) 파일을 실행하면 데이터베이스와 테이블이 자동으로 생성됩니다.
 
-```sql
-create database springtest;
-use springtest;
+MySQL Workbench 에서 파일을 열어 직접 실행할 수 있습니다.
 
-CREATE TABLE member (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(100) NOT NULL,
-    name VARCHAR(50) NOT NULL
-);
-
-select * from member;
-
-use springtest;
-
-CREATE TABLE post (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(200) NOT NULL,
-    content TEXT NOT NULL,
-    writer_id INT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-
-    -- 외래 키 설정 (member 테이블과 연동)
-    CONSTRAINT fk_post_writer FOREIGN KEY (writer_id) REFERENCES member(id) ON DELETE CASCADE
-);
-
-select * from post;
-
-```
+생성되는 테이블:
+- member: 사용자 정보 저장
+- post: 게시글 정보 저장 (작성자 외래 키 연동, 삭제 시 게시글 자동 삭제)
 
 ---
 
