@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
@@ -30,12 +32,20 @@ public class PostController {
 
     // 게시글 목록 조회 (최신순 + 페이징)
     @GetMapping
-    public ResponseEntity<List<PostDTO>> list(
+    public ResponseEntity<?> list(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size
+    ) {
         List<PostDTO> posts = postService.getPosts(page, size);
-        return ResponseEntity.ok(posts);
+        int totalCount = postService.getTotalCount();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("posts", posts);
+        result.put("totalCount", totalCount);
+
+        return ResponseEntity.ok(result);
     }
+
 
     // 게시글 상세 조회
     @GetMapping("/{id}")

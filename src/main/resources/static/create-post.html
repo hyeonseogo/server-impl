@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>게시글 작성</title>
+</head>
+<body>
+<nav>
+  <a href="post-list.html">🏠 홈</a>
+  <a href="create-post.html" id="navWrite" style="display:none;">✍️ 글쓰기</a>
+  <a href="mypage.html">🙍 마이페이지</a>
+  <a href="login.html" id="navLogin">🔐 로그인</a>
+  <a href="#" id="navLogout" style="display:none;">🚪 로그아웃</a>
+</nav>
+<hr>
+
+<h1>게시글 작성</h1>
+<form id="postForm">
+  <input type="text" id="title" placeholder="제목" required><br><br>
+  <textarea id="content" placeholder="내용" rows="10" cols="50" required></textarea><br><br>
+  <button type="submit">작성</button>
+  <button type="button" onclick="window.location.href='post-list.html'">목록으로</button>
+</form>
+
+<script>
+  const token = localStorage.getItem("token");
+
+  // 로그인 안 되어 있으면 로그인 페이지로 이동
+  if (!token) {
+    alert("로그인이 필요합니다.");
+    window.location.href = "login.html";
+  }
+
+  // nav 버튼 제어
+  if (token) {
+    document.getElementById("navWrite").style.display = "inline";
+    document.getElementById("navLogin").style.display = "none";
+    document.getElementById("navLogout").style.display = "inline";
+  }
+
+  document.getElementById("navLogout").addEventListener("click", () => {
+    localStorage.removeItem("token");
+    alert("로그아웃 되었습니다");
+    window.location.href = "login.html";
+  });
+
+  // 게시글 작성 요청
+  document.getElementById("postForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    fetch("/api/posts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({
+        title: document.getElementById("title").value,
+        content: document.getElementById("content").value
+      })
+    })
+            .then(res => {
+              if (res.ok) {
+                alert("게시글 작성 성공");
+                window.location.href = "post-list.html";
+              } else {
+                throw new Error("작성 실패 또는 권한 없음");
+              }
+            })
+            .catch(err => {
+              alert(err.message);
+            });
+  });
+</script>
+</body>
+</html>

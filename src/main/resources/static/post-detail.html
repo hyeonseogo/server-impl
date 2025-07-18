@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 상세</title>
+</head>
+<body>
+<nav>
+    <a href="post-list.html">🏠 홈</a>
+    <a href="create-post.html" id="navWrite" style="display:none;">✍️ 글쓰기</a>
+    <a href="mypage.html">🙍 마이페이지</a>
+    <a href="login.html" id="navLogin">🔐 로그인</a>
+    <a href="#" id="navLogout" style="display:none;">🚪 로그아웃</a>
+</nav>
+<hr>
+
+<h1>게시글 상세</h1>
+<div id="postContent">
+    <p>로딩 중...</p>
+</div>
+
+<button id="editBtn" style="display: none;">수정</button>
+<button id="deleteBtn" style="display: none;">삭제</button>
+<button onclick="window.location.href='post-list.html'">목록으로</button>
+
+<script>
+    const token = localStorage.getItem("token");
+    const params = new URLSearchParams(window.location.search);
+    const postId = params.get("id");
+
+    const postContent = document.getElementById("postContent");
+    const editBtn = document.getElementById("editBtn");
+    const deleteBtn = document.getElementById("deleteBtn");
+
+    let writerId = null;
+
+    // nav 버튼 제어
+    if (token) {
+        document.getElementById("navWrite").style.display = "inline";
+        document.getElementById("navLogin").style.display = "none";
+        document.getElementById("navLogout").style.display = "inline";
+    }
+
+    document.getElementById("navLogout").addEventListener("click", () => {
+        localStorage.removeItem("token");
+        alert("로그아웃 되었습니다");
+        window.location.href = "login.html";
+    });
+
+    // 게시글 상세 정보 가져오기
+    fetch(`/api/posts/${postId}`)
+        .then(res => res.json())
+        .then(post => {
+            writerId = post.writerId;
+            postContent.innerHTML = `
+          <h2>${post.title}</h2>
+          <p>${post.content}</p>
+          <p><strong>작성자:</strong> ${post.writerName}</p>
+          <p><strong>작성일:</strong> ${post.createdAt || ''}</p>
+        `;
+
+            // 로그인한 사용자 정보 가져오기
+            if (token) {
+                fetch("/api/member/info", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": "Bearer " + token
+                    }
+                })
+                    .then(res => res.json())
+                    .then(user => {
+                        if (user.id === writerId) {
+                            editBtn.style.display = "inline-block";
+                            deleteBtn.style.display = "inline-block";
+                        }
+                    });
+            }
+        })
+        .catch(err => {
+            console.error("상세 조회 실패:", err);
+            alert("게시글을 불러오지 못했습니다.");
+        });
+
+    // 수정 버튼 클릭
+    editBtn.addEventListener("click", () => {
+        window.location.href = `update-post.html?id=${postId}`;
+    });
+
+    // 삭제 버튼 클릭
+    deleteBtn.addEventListener("click", () => {
+        if (!confirm("정말 삭제하시겠습니까?")) return;
+
+        fetch(`/api/posts/${postId}`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert("삭제 성공");
+                    window.location.href = "post-list.html";
+                } else {
+                    throw new Error("삭제 권한 없음");
+                }
+            })
+            .catch(err => {
+                alert(err.message);
+            });
+    });
+</script>
+</body>
+</html>

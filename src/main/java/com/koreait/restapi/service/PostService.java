@@ -20,4 +20,6 @@ public interface PostService {
 
     // 게시글 삭제 (작성자만 가능)
     boolean deletePost(int postId, int userId);
+
+    int getTotalCount();
 }

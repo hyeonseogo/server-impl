@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 목록</title>
+</head>
+<body>
+<nav>
+    <a href="post-list.html">🏠 홈</a>
+    <a href="create-post.html" id="navWrite" style="display:none;">✍️ 글쓰기</a>
+    <a href="mypage.html">🙍 마이페이지</a>
+    <a href="login.html" id="navLogin">🔐 로그인</a>
+    <a href="#" id="navLogout" style="display:none;">🚪 로그아웃</a>
+</nav>
+<hr>
+
+<h1>게시글 목록</h1>
+<div id="postList"></div>
+<div id="pagination"></div>
+
+<button id="writeBtn" style="display:none;">글쓰기</button>
+<button id="logoutBtn">로그아웃</button>
+
+<script>
+    const token = localStorage.getItem("token");
+
+    if (token) {
+        document.getElementById("navWrite").style.display = "inline";
+        document.getElementById("navLogin").style.display = "none";
+        document.getElementById("navLogout").style.display = "inline";
+        document.getElementById("writeBtn").style.display = "inline-block";
+    }
+
+    document.getElementById("navLogout").addEventListener("click", () => {
+        localStorage.removeItem("token");
+        alert("로그아웃 되었습니다");
+        window.location.href = "login.html";
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+        localStorage.removeItem("token");
+        alert("로그아웃 되었습니다");
+        window.location.href = "login.html";
+    });
+
+    document.getElementById("writeBtn").addEventListener("click", () => {
+        window.location.href = "create-post.html";
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    const currentPage = parseInt(params.get("page")) || 0;
+    const pageSize = 10;
+
+    fetch(`/api/posts?page=${currentPage}&size=${pageSize}`)
+        .then(res => res.json())
+        .then(data => {
+            const posts = data.posts;
+            const totalCount = data.totalCount;
+            const totalPages = Math.ceil(totalCount / pageSize);
+
+            const listDiv = document.getElementById("postList");
+            listDiv.innerHTML = "";
+
+            if (!posts || posts.length === 0) {
+                listDiv.innerHTML = "<p>게시글이 없습니다.</p>";
+                return;
+            }
+
+            posts.forEach(post => {
+                const div = document.createElement("div");
+                div.innerHTML = `<a href="post-detail.html?id=${post.id}">${post.title}</a> | 작성자: ${post.writerName}`;
+                listDiv.appendChild(div);
+            });
+
+            const paginationDiv = document.getElementById("pagination");
+            paginationDiv.innerHTML = "";
+
+            for (let i = 0; i < totalPages; i++) {
+                const btn = document.createElement("button");
+                btn.textContent = i + 1;
+                if (i === currentPage) {
+                    btn.disabled = true;
+                }
+                btn.addEventListener("click", () => {
+                    window.location.href = `post-list.html?page=${i}`;
+                });
+                paginationDiv.appendChild(btn);
+            }
+        })
+        .catch(err => {
+            console.error("목록 로딩 실패:", err);
+            alert("게시글 목록 불러오기 실패");
+        });
+</script>
+</body>
+</html>

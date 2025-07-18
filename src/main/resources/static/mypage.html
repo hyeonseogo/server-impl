@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>마이페이지</title>
+</head>
+<body>
+<nav>
+    <a href="post-list.html">🏠 홈</a>
+    <a href="create-post.html" id="navWrite" style="display:none;">✍️ 글쓰기</a>
+    <a href="mypage.html">🙍 마이페이지</a>
+    <a href="login.html" id="navLogin">🔐 로그인</a>
+    <a href="#" id="navLogout" style="display:none;">🚪 로그아웃</a>
+</nav>
+<hr>
+
+<h1>마이페이지</h1>
+<form id="mypageForm">
+    <p><strong>아이디:</strong> <span id="username"></span></p>
+    <label>이름: <input type="text" id="name" required></label><br><br>
+    <label>새 비밀번호: <input type="password" id="password" placeholder="비우면 변경 안 함"></label><br><br>
+    <button type="submit">정보 수정</button>
+</form>
+
+<script>
+    const token = localStorage.getItem("token");
+    if (!token) {
+        alert("로그인이 필요합니다.");
+        window.location.href = "login.html";
+    }
+
+    // nav 버튼 제어
+    if (token) {
+        document.getElementById("navWrite").style.display = "inline";
+        document.getElementById("navLogin").style.display = "none";
+        document.getElementById("navLogout").style.display = "inline";
+    }
+
+    document.getElementById("navLogout").addEventListener("click", () => {
+        localStorage.removeItem("token");
+        alert("로그아웃 되었습니다");
+        window.location.href = "login.html";
+    });
+
+    // 사용자 정보 불러오기
+    fetch("/api/member/info", {
+        method: "GET",
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("username").textContent = data.username;
+            document.getElementById("name").value = data.name;
+        })
+        .catch(err => {
+            alert("사용자 정보를 불러오지 못했습니다.");
+            console.error(err);
+            window.location.href = "login.html";
+        });
+
+    // 정보 수정
+    document.getElementById("mypageForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        fetch("http://localhost:8081/api/member/update", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({
+                name: document.getElementById("name").value,
+                password: document.getElementById("password").value
+            })
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert("회원정보가 수정되었습니다.");
+                } else {
+                    throw new Error("수정 실패");
+                }
+            })
+            .catch(err => {
+                alert(err.message);
+            });
+    });
+</script>
+</body>
+</html>

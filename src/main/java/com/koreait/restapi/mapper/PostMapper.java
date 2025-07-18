@@ -23,4 +23,7 @@ public interface PostMapper {
 
     // 게시글 삭제
     void delete(@Param("id") int id);
+
+    int getTotalCount();
+
 }

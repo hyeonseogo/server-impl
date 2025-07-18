@@ -59,4 +59,10 @@ public class PostServiceImpl implements PostService {
         }
         return false;
     }
+
+    @Override
+    public int getTotalCount() {
+        return postMapper.getTotalCount();
+    }
+
 }

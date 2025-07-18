@@ -41,4 +41,8 @@
         DELETE FROM post WHERE id = #{id}
     </delete>
 
+    <select id="getTotalCount" resultType="int">
+        SELECT COUNT(*) FROM post
+    </select>
+
 </mapper>

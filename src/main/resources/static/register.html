@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>회원가입</title>
+</head>
+<body>
+<h1>회원가입</h1>
+<form id="registerForm">
+    <input type="text" id="username" placeholder="아이디" required><br>
+    <input type="password" id="password" placeholder="비밀번호" required><br>
+    <input type="text" id="name" placeholder="이름" required><br>
+    <button type="submit">가입하기</button>
+</form>
+
+<p>이미 회원이시라면? <a href="/login.html">로그인</a></p>
+
+<script>
+    document.getElementById("registerForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        fetch("/api/member/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username: document.getElementById("username").value,
+                password: document.getElementById("password").value,
+                name: document.getElementById("name").value
+            })
+        })
+            .then(res => res.ok ? alert("가입 성공") : alert("가입 실패"))
+    });
+</script>
+</body>
+</html>
