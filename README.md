@@ -5,7 +5,7 @@ JWT를 이용한 로그인 인증 기능과 BCrypt를 이용한 비밀번호 암
 
 ---
 
-## 🛠️ 사용 기술
+## 사용 기술
 
 - **Java 17**
 - **Spring Boot 3.5.0**
@@ -40,6 +40,7 @@ JWT를 이용한 로그인 인증 기능과 BCrypt를 이용한 비밀번호 암
 
 ## 📁 프로젝트 구조
 
+```
 src/
 ├── main/
 │ ├── java/
@@ -53,6 +54,7 @@ src/
 │ └── resources/
 │ ├── mapper/ # MyBatis XML
 │ └── application.properties
+```
 
 ---
 
