@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.koreait.restapi.mapper.PostMapper">
+
+    <!-- 게시글 작성 -->
+    <insert id="insert" parameterType="com.koreait.restapi.dto.PostDTO">
+        INSERT INTO post (title, content, writer_id, created_at)
+        VALUES (#{title}, #{content}, #{writerId}, #{createdAt})
+    </insert>
+
+    <!-- 게시글 목록 조회 (페이징 + 최신순) -->
+    <select id="findAll" resultType="com.koreait.restapi.dto.PostDTO">
+        SELECT p.*, m.name AS writerName
+        FROM post p
+                 JOIN member m ON p.writer_id = m.id
+        ORDER BY p.created_at DESC
+            LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 게시글 상세 조회 -->
+    <select id="findById" parameterType="int" resultType="com.koreait.restapi.dto.PostDTO">
+        SELECT p.*, m.name AS writerName
+        FROM post p
+                 JOIN member m ON p.writer_id = m.id
+        WHERE p.id = #{id}
+    </select>
+
+    <!-- 게시글 수정 -->
+    <update id="update" parameterType="com.koreait.restapi.dto.PostDTO">
+        UPDATE post
+        SET title = #{title},
+            content = #{content},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 게시글 삭제 -->
+    <delete id="delete" parameterType="int">
+        DELETE FROM post WHERE id = #{id}
+    </delete>
+
+</mapper>
